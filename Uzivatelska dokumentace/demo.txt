@@ -1,0 +1,173 @@
+
+
+Na začátku začínáme s kasou, které neobsahuje žádná data.
+
+Můžeme se podívat, že kasa neobsahuje položky:
+
+show items
+No items added.
+
+Ani objednávky:
+
+show orders
+No orders added
+
+Můžeme přidat objednávky – colu za 40 Kč, vodu za 20 Kč, pizzu za 120 Kč.
+
+add item
+Enter item: cola 40
+Enter item: voda 20
+Enter item: pizza 120
+Enter item: //prazdnym radkem ukoncime nacitani
+
+A podívat se, co v databázi máme: 
+
+show items
+cola..........................40.00
+voda..........................20.00
+pizza.........................120.00
+
+Můžeme vytvořit objednávku: 
+
+add order
+Enter item: cola 2
+Enter item: voda 2
+Enter item: pizza 4
+Enter item:  
+
+Nyní se podívat, jaké objednávky máme:
+
+show orders
+1 
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 4.00 480.00
+Order sum: 600.00
+
+Pokladna za nás vytvořila objednávku se jménem 1.
+
+Pizzu jsme špatně namarkovali a chceme z objednávky odebrat pizzu:
+
+add to 1 // příkaz
+1 //objednávku nám to ukáže
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 4.00 480.00
+Order sum: 600.00
+
+Enter item: pizza -1
+Enter item:
+
+Nyní se podíváme na objednávky: 
+
+show orders
+1 
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 3.00 360.00 // pizza smazaná
+Order sum: 480.00 
+
+Pizzu chceme vrátit: 
+
+a to 1
+1 
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 3.00 360.00
+Order sum: 480.00
+
+Enter item: pizza 1
+Enter item: 
+show orders
+1 
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 4.00 480.00
+Order sum: 600.00
+
+Hosté se rozhodnou platit. Chceme zprocesovat objednávku 1.
+
+pro 1
+1 
+cola..........................40.00 x 2.00 80.00
+voda..........................20.00 x 2.00 40.00
+pizza.........................120.00 x 4.00 480.00
+Order sum: 600.00
+
+Paid: 650 //zadáme placenou částku
+Return: 50.00 //částka na vrácení
+
+Vytvoříme objednávku:
+
+add order Stul1 //s vlastním jménem objednávky
+Enter item: voda
+Enter item:
+
+Objednávku chceme smazat:
+
+remove order
+Stul1
+
+
+Ukázky některých krajních a chybových případů. Program odchytává všechny. 
+
+Vytvoříme objednávku test:
+
+Enter item: aaa //neexistuje
+Item does not exist. //chybova hlaska
+
+a to test 
+test 
+Order sum: 0.00
+
+Enter item: cola 100 //pridame 100x colu
+Order cannot contain more than 99 pieces of a single item type. // nelze
+
+Enter item: cola -1
+Order can not contain negative amount of items. //mnozstvi nemuze byt zaporne
+
+Enter item: cola 50 
+Enter item: cola -51 //cola uz objednavce byla, mnozstvi by bylo zaporne, timto ho smazem na nulu
+Deleting item from order.
+
+
+a to test // pridavame do objednavky test
+test 
+Order sum: 0.00
+
+Enter item: pizza r
+Invalid amount.
+
+Enter item: pizza 6 // 6x pizza
+Enter item:
+
+Pizzu zkusíme smazat z databáze:
+
+
+rem it //zkratka
+Item to remove: pizza
+All orders containing this item must be processed. //nelze odebrat pizzu, protoze existuje objednavka, ktera ji obsahuje
+
+pro test //objednávku zprocesujeme
+test 
+pizza.........................120.00 x 6.00 720.00
+Order sum: 720.00
+
+Paid: 800
+Return: 80.00
+
+
+rem it //ted uz pizza jde smazat
+Item to remove: pizza
+Item to remove: 
+
+
+
+
+
+
+
+
+
+
+

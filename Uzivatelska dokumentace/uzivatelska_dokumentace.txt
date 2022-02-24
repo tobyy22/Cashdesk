@@ -1,0 +1,58 @@
+Program má několik základních příkazů, jak se s ním komunikuje.
+
+show
+Příkaz pro zobrazování informací o pokladně.
+Zkratka : sh
+Parametry:
+	items – ukáže položky v pokladně, zkratka it
+	orders – ukáže objednávky, zkratka or
+	cash – peníze v pokladně, zkratka ca
+
+add
+Přidávání položek, objednávek, položek do objednávek, nastavování hotovosti v pokladně. 
+Zkratka: a
+Parametry:
+	item – po zadání add item a stiskutní enter se objeví nový řádek s textem Enter item. Očekává se zadání
+	       nové položky do systému ve formátu: JmenoPolozky CenaPolozky
+	     – Po zadání položky se očekává další položka, vstup položek se ukončí prázdným řádkem
+	     – Jméno položky je case sensitive a nesmí obsahovat mezery. Možno zlepšit v další verzi.
+	     – CenaPolozky musí být reálné číslo, aby ji systém akceptoval
+	     – Pokud je vstup je cena zadaná špatně, kasa již obsahuje položku s tímto jmnénem nebo v případě
+	       jiného problému pokladna položku nepřijme.
+	     – zkratka it
+        
+	order – po zadání add order a stiskutní enter se objeví nový řádek s textem Enter item. Očekává se zadání
+                nové položky do nové objednávky: JmenoPolozky Mnozstvi
+              – Po zadání položky se očekává další položka, vstup položek se ukončí prázdným řádkem
+	      – Jméno objednávky je možné specifikovat názvem za parametrem order
+              – Jméno objednávky je case sensitive a nesmí obsahovat mezery. Možno zlepšit v další verzi.
+              – Množství musí být reálné číslo, aby ji systém akceptoval
+              – Pokud je vstup je cena zadaná špatně, kasa již obsahuje položku s tímto jmnénem nebo v případě
+               jiného problému pokladna položku nepřijme.
+              – zkratka or
+	 
+	to – přidání položky do objednávky specifikované za parametrem
+	   – zadávání položek stále stejné, specifikuje se opě množství položky v objednávce
+	   – pomocí tohoto příkazu se i odebírají položky z objednávek – před číslo se napíše mínus
+			
+	cash – zkratka ca
+	     – nastaví počet peněz v kase na hodnotu zadanou za parametrem 
+
+remove
+Odebírání položek z kasy, odebírání objednávek.
+Parametry:
+	item – za parametr se zadá jmnéno odebírané položky
+	order – za parametr se napíše jméno odebírané položky
+
+process
+Zprocesování objednávky.
+Parametry
+	– parametr je jméno objednávky, stisknete enter, následně zadáte přijatou částku a program dopočítá částku na vrácení 
+	  a peníze připíše do kasy
+	
+
+end
+Nemá parametry, ukončí program.
+
+
+

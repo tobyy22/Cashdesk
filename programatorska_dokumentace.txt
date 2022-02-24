@@ -1,0 +1,118 @@
+Build
+
+Součást programu je CMakeLists.txt pro cmake. Program stačí zkompilovat
+pomocí 2 příkazů: 
+
+cmake -S. -Bbuild
+cmake --build build 
+
+Tím v adresáři build budeme mít přeložený program, vytvoří se tam i kopie
+adresáře s databází. Následně přejdeme do adresáře build a pomocí
+
+./Cashdesk
+
+spustíme program.
+
+
+
+Architektura programu
+
+Program se skládá ze 3 hlavních komponent - uživatelský interface, 
+samotná pokladna a api pro fyzické uložení dat. Jednotlivé komponenty
+jsem se pokusil udělat vzájemně co nejvíce nezávislé tak, aby případné
+změny v programu šly dělat lokálně a nebylo nutné přepsat celý
+program.
+
+Uživatelský interface
+
+Uživatelský interface se dělí na základní příkazy, jako je add, show,
+remove,...
+Každý příkaz je implementovaný pomocí potomka třídy Command. Tato
+třída obsahuje virtuální NEimplementovanou funkci process_command,
+tudíž každý její potomek musí tuto funkci implementovat. Tato funkce
+poskytuje jakýsi interface, jak příkazy postupně zpracovávat. 
+
+Cyklus programu tedy funguje tak, že se načte vstup od uživatele. Tento
+vstup se předá funkci correct_command (třídy Command), která jej 
+naparsuje, podle prvního tokenu rozpozná typ příkazu(show,add,...) a 
+vytvoří objekt příkazu - potomka. Pokud to konstruktor potomka vyžaduje,
+předáme mu pointer na kasu a naparsovaný celý vstup. Následně již jen 
+zavoláme funkci process_command, která zařídí zprocesování příkazu. 
+
+Obecně to funguje tak, že command si analyzuje zbylé tokeny a podle
+toho volá správné funkce pokladny. Může si říct i o upřesnění vstupu,
+všechen vstup od uživatele tedy nemusí projít přes ten základní cyklus. 
+ 
+Pokud bychom rozšiřovali UI, stačí naprogramovat nového potomka,
+ve funkci correct_command jej vytvářet a případně definovat zkratky
+pro tento příkaz a pro případné nové parametry, které tento příkaz používá.
+Pokladny se to vůbec nemusí týkat. Druhá věc je, že pokladna poskytuje
+nějaký interface a UI by se mohlo hodit, kdyby se rozhraní pokladny
+rozšířilo. Jsou to ale 2 oddělené věci, které lze řešit každou nezávisle.
+
+Pokladna
+
+Pokladna - data
+
+Pokladna obsahuje data - vector<Item> a vector <Order>, kde Item
+je třída pro reprezentaci položky, Order reprezentace objednávky.
+Základ třídy Order je datová struktura tuple, která sdružuje pointer
+na Item a proměnnou typu Money (reprezentace peněz), která udává 
+množství položky v objednávce. Tento pointer je pouze observe_ptr,
+který žádným způsobem neřeší alokaci paměti. Při vytváření objednávky
+samozřejmě umožňuji přidat jet existující položky a zároveň hlídám,
+že neodstraním položku, která je obsažena v objednávce. 
+
+Pokladna - interface
+
+Interface pokladny vypadá tak, že naprostá většina funkcí přijímá 
+parametry typu string. To je tak navrženo z toho důvodu, aby byla
+pokladna jednoduše implementovatelná s jiným UI. Pokud bych chtěl
+například GUI, kde by byly nějaké buttony, textová pole, atd...
+Stačilo by pokladně předávat jen data z těchto polí a volat správné
+funkce při zmáčknutí daného buttonu. 
+
+Pro můj interface dávalo v některých případech smysl, aby pokladna
+oznámila pomocí bool, zda se zdařilo požadavek zpracovat, nebo zda
+se například snažíme vytvořit objednávku s již existujícím jménem.
+
+Pokladna - reprezentace čísel
+
+Pokladna reprezentuje peníze a jiná číselná data pomocí knihovny
+decimal.h. Vytvořil jsem si vlastní typ Money reprezentující
+dec::decimal<2>, což znamená, že používám decimální čísla na 2
+desetiny. Pokud chceme zavolat nějakou funkci pokladny, kde se očekává
+číselná hodnota, tak UI zkontroluje, že se skutečně jedná o číslo
+(tedy že je ve tvaru buď celého čísla anebo obsahuje desetinnou tečku,
+za kterou obsahuje alespoň jednu číslici). Následně pokladna zkontroluje,
+zda toto obdržené číslo není větší než 1 000 000 000. To kontroluju tak,
+že počet číslic před tečkou není větší než 9 a desetinná čísla neřeším.
+Díky tomu vím, že typ Money se nebude chovat nedefinovaně, můžu tuto
+částku porovnávat s různými konstantami a hlídat, že mi v žádné operaci
+nepřeteče. Tento nepříliš ideální způsob jsem zvolil proto, že v
+té knihovně jsem nenašel žádné funkce, které by rozpoznaly, zda
+dané číslo podporuji či nikoliv. 
+
+
+Data
+
+"Databáze" je implementovaná pomocí tří tabulek. Všechny jsou v csv
+formátu. První tabulka obsahuje údaje o položkách - jméno,cena. 
+Druhá tabulka obsahuje pouze jména objednávek. Třetí tabulka
+obsahuje trojice objednávka,položka,množství v objednávce.
+
+Na začátku pokladna předá reference na svá data - vektory a tato třída
+se postará o načtení všech dat. Následně tato třída poskytuje
+interface pro okamžité ukládání dat. Vždy, když se data v pokladně
+změní, pokladna to oznámí úložišti a to se samo upraví. Díky tomu,
+že pokladna obsahuje určitá omezení z důvodu reprezentace peněz, v
+databázi jsem již žádná omezení nedělal. 
+
+Pokladna obsahuje veškerou logiku toho, zda je položku, objednávku,...
+možné přidat,odebrat,...Třída dat obsahuje jen pár jednoduchých
+triggerů. Pokud bychom tuto třídu chtěli využívat jako plnohodnotnou
+databázi, museli bychom všechny kontroly dělat na této úrovni a 
+poskytnout lepší interface, jak jednotlivá data z databáze získávat.
+
+Za způsob uložení je ale zodpovědná jen tato třída, pokud bych se
+rozhodl použít jiný formát dat, zbytku aplikace se to týkat nebude.  
