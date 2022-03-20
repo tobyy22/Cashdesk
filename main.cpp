@@ -6,14 +6,17 @@
 //
 
 #include <iostream>
-#include "Item.hpp"
-#include "CashDesk.hpp"
-#include "lib/decimal.h"
-#include "Command.hpp"
-#include "Data.hpp"
-
 #include <string>
 #include <memory>
+#include <algorithm>
+
+#include <ctime>
+#include <chrono>
+
+#include "lib/decimal.h"
+#include "Command.hpp"
+
+
 
 using namespace std;
 
@@ -35,11 +38,13 @@ int main(int argc, const char * argv[]) {
      napriklad rozhrani jednotlivych commandu, ktere po naparsovani volaji na tomto objektu spravne funkce.
      Jrdnolive commandy si vytvari na kasu vlastni pointer.
      */
-//    std::shared_ptr<CashDesk> kasa (new CashDesk);
     
     CashDesk kasa;
+//
+//    for (int i = 211; i < 500; i++) {
+//        kasa.add_to_order("188", to_string(i), "4");
+//    }
 
-    
     /*
      Zde je algoritmus cele pokladny – nacte se input od uzivatele do promenne input, z inputu se vytvori spravny command,
      ktery nasledne virtualni funkce process_command zprocesuje
@@ -49,10 +54,14 @@ int main(int argc, const char * argv[]) {
      
      */
     string input;
+    cout << endl << "Command: ";
 
     while (getline(cin, input)) {
         command = Command::correct_command(input, kasa);
         command->process_command();
+        
+        cout << endl << "Command: ";
+
     }
 }
 

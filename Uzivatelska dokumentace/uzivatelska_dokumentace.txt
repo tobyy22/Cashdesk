@@ -1,3 +1,9 @@
+
+Používání kasy je myšleno tak, že na začátku používání kasy si ji naplníte 
+vlastními daty – položkami, které ve vašem podniku prodáváte, případně nastavíte
+počáteční hotovost v kase. Následně kasu můžete začít používat v běžném provozu.
+
+
 Program má několik základních příkazů, jak se s ním komunikuje.
 
 show
@@ -53,6 +59,10 @@ Parametry
 
 end
 Nemá parametry, ukončí program.
+
+Ve složce saved se vám ukládají všechny zpracované objednávky. Správa objednávek
+je v současné chvíli na uživateli. Objednávky se ukládají ve formátu 
+"jméno objednávky" - "datum a čas zpracování".
 
 
 

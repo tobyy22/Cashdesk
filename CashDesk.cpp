@@ -6,6 +6,7 @@
 //
 
 #include <iostream>
+
 #include "CashDesk.hpp"
 
 //Pri vytvoreni kasy jen nactu data
@@ -103,20 +104,29 @@ bool CashDesk::add_order(const string& order_name) {
 }
 
 //pridani objednavky bez specifikace jmena
-void CashDesk::add_order() {
+bool CashDesk::add_order() {
     
     //kontrola poctu objednavek
     if((int)orders.size() == max_number_of_orders) {
         cout << "Maximum number of orders in this CashDesk has been reached." << endl;
-        return;
+        return false;
     }
     
     //postupne generuji jmena pomoci get_unique tridy Identificator a pomoci predchozi funkce zkousim objednavku pridat
     while(true) {
         if(add_order(orders_id.get_unique())) {
-            break;
+            return true;
         }
     }
+    return false;
+}
+
+int CashDesk::number_of_all_items_in_all_orders() {
+    int result = 0;
+    for (size_t i = 0; i < orders.size(); i++) {
+        result += orders[i].order_size();
+    }
+    return result;
 }
 
 //pridani polozky do aktivni objednavky
@@ -134,6 +144,18 @@ void CashDesk::add_to_order(const string& order_name, const string& item_name, c
         return;
     }
     
+    //vytvorim si objekt Money
+    Money m(amount);
+
+    
+    if(number_of_all_items_in_all_orders() >= max_number_of_all_items_in_all_orders) {
+        if(m > 0) {
+            cout << "Data in cashdesk exceeded. Please process some orders." << endl;
+            return;
+        }
+
+    }
+    
     //pokud objednavka nebo item neexituji, nic nedelam, o vypis chyby se staraji funkce get_order_pointer_by_name a get_item_pointer_by_name
     observer_ptr<Order> order = get_order_pointer_by_name(order_name, false, true);
     observer_ptr<Item> item = get_item_pointer_by_name(item_name, false, true);
@@ -142,8 +164,6 @@ void CashDesk::add_to_order(const string& order_name, const string& item_name, c
         return;
     }
     
-    //vytvorim si objekt Money
-    Money m(amount);
 
     //zkusim pridat polozku do objednavky, v pripade uspechu to oznamim ulozisti
     if(order->add_item_to_order(item, m)) {
@@ -201,7 +221,7 @@ void CashDesk::remove_item(const string& name) {
     
     //nasledne najdu a smazu samotny item
     for (size_t i = 0; i < this->items.size(); ++i) {
-        if(this->items[i].getName() == name) {
+        if(this->items[i].get_name() == name) {
             this->items.erase(items.begin() + (int)i);
             return;
         }
@@ -211,8 +231,8 @@ void CashDesk::remove_item(const string& name) {
 //funkce na nalezeni itemu
 void CashDesk::find_item(const string& item) {
     for (size_t i = 0; i < items.size(); i++) {
-        if(items[i].getName().find(item) != string::npos) {
-            items[i].ShowItem();
+        if(items[i].get_name().find(item) != string::npos) {
+            cout << items[i] << endl;
         }
     }
 }
@@ -224,7 +244,7 @@ void CashDesk::show_all_items(){
         return;
     }
     for (size_t i = 0; i < items.size(); ++i) {
-        items[i].ShowItem();
+        cout << items[i] << endl;
     }
 }
 
@@ -232,7 +252,7 @@ void CashDesk::show_all_items(){
 void CashDesk::find_order(const string& order_name) {
     for (size_t i = 0; i < orders.size(); ++i) {
         if(orders[i].order_name().find(order_name) != string::npos) {
-            orders[i].show_order();
+            cout << orders[i];
         }
     }
 }
@@ -244,14 +264,14 @@ void CashDesk::show_all_orders() {
         return;
     }
     for (size_t i = 0; i < orders.size(); ++i) {
-        orders[i].show_order();
+        cout << orders[i];
     }
 }
 
 //najde item v databazi a vrati na nej pointer
 observer_ptr<Item> CashDesk::get_item_pointer_by_name(const string& name, bool success, bool fail) {
     for (size_t i = 0; i < items.size(); ++i) {
-        if(items[i].getName() == name) {
+        if(items[i].get_name() == name) {
             if(success) {
                 cout << "Item exists." << endl;
             }
@@ -279,16 +299,17 @@ bool CashDesk::show_order(const string& order_name) {
         return false;
     }
     active_order = order;
-    order->show_order();
+    cout << *order;
     return true;
 }
 
-void CashDesk::show_order() {
+bool CashDesk::show_active_order() {
     if(active_order == nullptr) {
         cout << "Please specify order." << endl;
-        return;
+        return false;
     }
     active_order->show_order();
+    return true;
 }
 
 /* Funkce na zprocesovani objednavky, dostane jmeno zaplacene objednavky a placenou castku.
@@ -307,7 +328,7 @@ bool CashDesk::process_order(const string& order_name, const string& paid) {
     
     //prevede si placenou castku a rekne si o celkovou sumu objednavky
     Money paid_converted(paid);
-    Money order_price = order->sum_order();
+    Money order_price = order->order_sum;
     
     //zkontroluje, ze castka staci
     if(paid_converted < order_price) {
@@ -315,10 +336,17 @@ bool CashDesk::process_order(const string& order_name, const string& paid) {
         return false;
     }
     
+    if(order_price + this->cash > max_cash_in_cashdesk) {
+        cout << "Amount of money in cashdesk would exceed." << endl;
+        return false;
+    }
+    
     //rekne, kolik zakaznikovi vracime, pricte penize do kasy, odebere objednavku
     cout << "Return: " << paid_converted - order_price << endl;
     this->cash += order_price;
+    data.save_order(*order);
     remove_order(order_name);
+    
     return true;
 }
 
@@ -387,10 +415,10 @@ bool CashDesk::negative_price_ok(string amount, int n) {
 bool CashDesk::price_ok(string amount) {
     
     //konkretne kontroluje zvlast kladne a zaporne moznosti – viz implementace vyse
-    if(positive_price_ok(amount, 8)) {
+    if(positive_price_ok(amount, 9)) {
         return true;
     }
-    if(negative_price_ok(amount, 8)) {
+    if(negative_price_ok(amount, 9)) {
         return true;
     }
     return false;

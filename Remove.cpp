@@ -29,6 +29,13 @@ void Remove::remove_item() {
     string input;
     cout << "Item to remove: ";
     while (getline(cin, input)) {
+        
+        if(!is_input_ascii(input)) {
+            cout << "Not supported input" << endl;
+            cout << "Item to remove: ";
+            continue;
+        }
+        
         //prazdny vstup ukonci nacitani itemu
         if(input.empty()) {
             return;
@@ -51,65 +58,26 @@ void Remove::remove_order() {
     string input;
     cout << "Order to remove: ";
     while (getline(cin, input)) {
+        
+        if(!is_input_ascii(input)) {
+            cout << "Not supported input" << endl;
+            cout << "Order to remove: ";
+
+            continue;
+        }
+        
         if(input.empty()) {
             return;
         }
         vector<string> items_to_add = Command::tokenize_command(input);
         if(items_to_add.size() != 1) {
             cout << "Please enter only order name." << endl;
+            cout << "Order to remove: ";
+
             continue;
         }
         kasa->remove_order(items_to_add[0]);
         cout << "Order to remove: ";
     }
 }
-
-//void Remove::read_order_items() {
-//    string input;
-//    cout << "Enter item: ";
-//    while (getline(cin, input)) {
-//        if(input.empty()) {
-//            return;
-//        }
-//        vector<string> items_to_add = Command::tokenize_command(input);
-//        string amount_temp;
-//        if(items_to_add.size() == 1) {
-//            amount_temp = "1";
-//        }
-//        else if(items_to_add.size() == 2) {
-//            if(is_decimal(items_to_add[1])) {
-//                amount_temp = items_to_add[1];
-//            }
-//        }
-//        else {
-//            cout << "Error with reading item." << endl;
-//            continue;
-//        }
-//        kasa->add_to_order(items_to_add[0],  "-" + amount_temp);
-//        cout << "Enter item: ";
-//    }
-//}
-
-
-
-//void Remove::remove_from() {
-//    if(tokenized.size() == 2) {
-//        if(!kasa->active_order_ready()) {
-//            cout << "No active order." << endl;
-//            return;
-//        }
-//        kasa->show_order();
-//    }
-//    else if(tokenized.size() == 3) {
-//        if(!kasa->show_order(tokenized[2])) {
-//            cout << "Order does not exist." << endl;
-//            return;
-//        }
-//    }
-//    else {
-//        cout << "Unknown parameters." << endl;
-//        return;
-//    }
-//    read_order_items();
-//}
 

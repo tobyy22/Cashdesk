@@ -4,11 +4,12 @@
 //
 //  Created by Tobias Vavroch on 21/10/2021.
 //
-#pragma once
 
 
 #include <stdio.h>
 #include <string>
+#include <iostream>
+
 #include "lib/decimal.h"
 
 template<typename T>
@@ -46,8 +47,11 @@ public:
     /*jednoduche funkce, ktere pouze vraci jmeno polozky, jeji cenu, pripadne polozku v prehlednem formatu vypisuji
      podrobnejsi komentare u implementaci funkci
      */
-    const string& getName();
-    const Money& getPrice();
-    void ShowItem();
-    void ShowItem(Money m);
+    const string& get_name();
+    const Money& get_price();
+    
+    //vypis
+    friend ostream& operator<<(ostream& os, const Item& order);
+
+    
 };

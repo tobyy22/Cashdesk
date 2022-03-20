@@ -5,17 +5,17 @@
 //  Created by Tobias Vavroch on 11/11/2021.
 //
 
-
-
-#pragma once
-#include "lib/decimal.h"
-#include "Item.hpp"
-#include "Order.hpp"
 #include <filesystem>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
+
+#include "lib/decimal.h"
+#include "Order.hpp"
+
+
+using namespace std;
 
 
 /*
@@ -36,6 +36,8 @@ private:
     const string orders_file = path + "Orders.txt";
     const string items_in_orders_file = path + "Items_in_orders.txt";
     const vector<string> files_to_check = {items_file, orders_file,items_in_orders_file};
+    
+    const string path_to_orders = "saved/";
     
     /*
      Trida ma v pameti ulozene jmena vsech polozek a jmena vsech objednavek pro rychlejsi praci s daty.
@@ -76,5 +78,6 @@ public:
     void delete_order(const string& order_name);
     void delete_item_from_order(const string& item, const string& order_name);
     
-
+    void save_order(Order& order);
+    string get_time_stamp();
 };

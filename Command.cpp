@@ -5,7 +5,6 @@
 //  Created by Tobias Vavroch on 09/11/2021.
 //
 
-#include <iostream>
 
 #include "Command.hpp"
 
@@ -14,6 +13,12 @@
  Vytvoreny prikaz vraci.
  Funkce se vzdy porovnava prvni prikaz se vsemi moznymi zkratkami tohoto prikazu.*/
 unique_ptr<Command> Command::correct_command(const string& input, CashDesk& kasa) {
+    
+    //neascii input resim pomoci Uknknown commandu
+    if (!is_input_ascii(input)) {
+        unique_ptr<Command> command_ptr (new Unknown());
+        return command_ptr;
+    }
     
     //tokenizace inputu
     vector<string> tokenized = tokenize_command(input);
@@ -70,10 +75,12 @@ vector<string> Command::tokenize_command(const string& command) {
 
 //funkce overujici, zda je dec v decimalnim formatu
 bool Command::is_decimal(const string& dec) {
+//    cout < << endl;
+
+    //zrejme
     if(dec == "-") {
         return false;
     }
-    bool is_dec = true;
     size_t i = 0;
     if(dec[0] == '-') {
         i = 1;
@@ -82,8 +89,9 @@ bool Command::is_decimal(const string& dec) {
         i++;
     }
     if(i == dec.size()) {
-        return is_dec;
+        return true;
     }
+
     if(dec[i] == '.') {
         i++;
     }
@@ -94,9 +102,19 @@ bool Command::is_decimal(const string& dec) {
         i++;
     }
     if(i == dec.size()) {
-        return is_dec;
+        return true;
     }
     return false;
+}
+
+//jednoduse pomoci knihovni funkce prochazim cely string to znacich
+bool Command::is_input_ascii(const string &string_to_check) {
+    for (size_t i = 0; i < string_to_check.size(); i++) {
+        if(!isascii(string_to_check[i])) {
+            return false;
+        }
+    }
+    return true;
 }
 
 

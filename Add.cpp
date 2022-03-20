@@ -54,6 +54,12 @@ void Add::add_items() {
     //nasledne probiha nacitani itemu
     while (getline(cin, input)) {
         
+        if(!is_input_ascii(input)) {
+            cout << "Not supported input" << endl;
+            cout << "Enter item: ";
+            continue;
+        }
+        
         //prazdny input ukonci nacitani itemu
         if(input.empty()) {
             return;
@@ -90,6 +96,13 @@ void Add::read_order_items() {
     string input;
     cout << "Enter item: ";
     while (getline(cin, input)) {
+        
+        if(!is_input_ascii(input)) {
+            cout << "Not supported input" << endl;
+            cout << "Enter item: ";
+            continue;
+        }
+        
         if(input.empty()) {
             return;
         }
@@ -110,6 +123,7 @@ void Add::read_order_items() {
         }
         else {
             cout << "Error with reading item." << endl;
+            cout << "Enter item: ";
             continue;
         }
         
@@ -125,13 +139,21 @@ void Add::add_order() {
     
     //jmeno objednavky nespecifikovane
     if(tokenized.size() < 3) {
-        kasa->add_order();
+        
+        /*
+         nemusi se podarit pridat ani bezejmennou objednaku - kasa vrati false, pokud je jiz naplnen
+         maximalni pocet objednavek
+         */
+        if(!kasa->add_order()) {
+            return;
+        }
         //nacitam polozky do objednavky
         read_order_items();
         return;
     }
     //jinak se pokusim pridat objednavku se specifikovanym jmenem
     if(!kasa->add_order(tokenized[2])) {
+        cout << "Order exists!" << endl;
         return;
     }
     //pokud se podari ji pridat, nacitam do ni itemy
@@ -165,7 +187,7 @@ void Add::add_to() {
             return;
         }
         //ukazu aktivni objednavku
-        kasa->show_order();
+        kasa->show_active_order();
     }
     else if(tokenized.size() == 3) {
         

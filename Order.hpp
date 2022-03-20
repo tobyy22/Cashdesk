@@ -5,11 +5,11 @@
 //  Created by Tobias Vavroch on 21/10/2021.
 //
 
-#pragma once
 
 #include <stdio.h>
 #include <vector>
 #include <tuple>
+#include <iostream>
 
 #include "Item.hpp"
 #include "lib/decimal.h"
@@ -28,9 +28,24 @@ private:
     /* Obsahuje jmeno objednavky, a vektor tuplu, coz je vlastne samotna objednvka. Tuple je slozen z pointeru na Item a objekt tridy Money pro reprezentaci mnozstvi
      polozky v objednavce. Chci, aby pocet itemu v objednavce nemuselo byt cele cislo.*/
     string OrderName;
-    vector<tuple<observer_ptr<Item>, Money>> ItemsInOrder;
+    
+    
+    //struktura sdruzujici polozku a mnozstvi polozky v objednavce
+    struct item_in_order {
+        observer_ptr<Item> item;
+        Money amount;
+        item_in_order(observer_ptr<Item> given_item,Money given_amount) : item(given_item), amount(given_amount){}
+    };
+    
+    vector<item_in_order> items_in_order;
+
 
 public:
+    
+    // prubezne aktualizovana promenna obsahujici celkovou hodnotu objevnavky
+    Money order_sum;
+    
+    
     //u objednavky na zacatku staci jmeno, polozky se pridavaji postupne
     Order(const string& name);
     
@@ -41,6 +56,12 @@ public:
     bool add_item_to_order(observer_ptr<Item> item, const Money& amount);
     void show_order();
     int order_size();
-    Money sum_order();
+    void sum_order();
+    
+    //zjisti, zda danoy item predany pointerem jiz obsahuje
     bool contains_item(observer_ptr<Item> item);
+    
+
+    //vypis objednavky
+    friend ostream& operator<<(ostream& os, const Order& order);
 };

@@ -115,4 +115,7 @@ databázi, museli bychom všechny kontroly dělat na této úrovni a
 poskytnout lepší interface, jak jednotlivá data z databáze získávat.
 
 Za způsob uložení je ale zodpovědná jen tato třída, pokud bych se
-rozhodl použít jiný formát dat, zbytku aplikace se to týkat nebude.  
+rozhodl použít jiný formát dat, zbytku aplikace se to týkat nebude. 
+
+Tato část se stará i o fyzické uložení objednávek. Objednávky ukládá
+ve stejném formátu jako se vypisují v průběhu používání programu. 

@@ -6,3 +6,4 @@ add_executable(Cashdesk main.cpp Add.cpp CashDesk.cpp Command.cpp Data.cpp Order
 
 SET(CMAKE_CXX_FLAGS "-std=gnu++17")
 file(COPY db DESTINATION .)
+file(COPY saved DESTINATION .)

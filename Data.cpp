@@ -46,6 +46,7 @@ vector<string> Data_Handler::parse_csv_line(const string& line) {
 
 //nacteni itemu do vektoru
 void Data_Handler::load_items(vector<Item> &items) {
+    
     //otevru si stream ze souboru kde jsou ulozene itemy
     ifstream items_stream(items_file);
     std::string line;
@@ -107,7 +108,7 @@ void Data_Handler::load_items_to_orders(vector<Item> &items, vector<Order> &orde
                 if(orders[i].order_name() == data[0]) {
                     //najdu samotnou polozku, at na ni mam pointer
                     for (size_t j = 0; j < items.size(); ++j) {
-                        if(items[j].getName() == data[1]) {
+                        if(items[j].get_name() == data[1]) {
                             //do objednavky pridam polozku
                             orders[i].add_item_to_order(&items[j], Money(data[2]));
                             break;
@@ -126,7 +127,7 @@ void Data_Handler::load_items_to_orders(vector<Item> &items, vector<Order> &orde
 //kontrola a pripadne vytvoreni tabulek(souboru) databaze
 void Data_Handler::check_if_files_exists() {
     for (size_t i = 0; i < files_to_check.size(); ++i) {
-        if(!std::__fs::filesystem::exists(files_to_check[i])) {
+        if(!std::filesystem::exists(files_to_check[i])) {
             std::ofstream outfile (files_to_check[i]);
             outfile.close();
         }
@@ -313,6 +314,50 @@ void Data_Handler::delete_nth_line(const string& filename, int n) {
     rename((path + "Temp.txt").c_str(), filename.c_str());
 }
 
+//vrati soucasne datum a cas ve formatu string
+string Data_Handler::get_time_stamp() {
+
+    time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now());
+    std::stringstream ss;
+    ss << ctime(&now);
+    string time = ss.str();
+    time.erase(remove_if(time.begin(), time.end(), ::isspace), time.end());
+    return time;
+}
+
+void Data_Handler::save_order(Order &order_to_save) {
+    
+    //nejprve vytvorim jmeno objednavky - potrebuji rozlisit pripady, kdy objednavka ma/nema jmeno
+    string order_name = "";
+    
+    if(order_to_save.order_name().empty()) {
+        order_name = "NoName";
+    }
+    else {
+        order_name = order_to_save.order_name();
+    }
+    
+    //nasledne si reknu o datum a cas
+    string time = get_time_stamp();
+
+    string save_name = path_to_orders +  order_name + "-" + time + ".txt";
+    
+    /*
+     tady resim extremni pripad, ktery nejspis ani nemuze nastat ale pro jistotu
+     get_time_stamp vraci konkretni datum, hodinu i vterinu
+     teoreticky by se mohlo stat, ze by uzivatel zprocesoval 2 objednavky stejneho jmena ve stejnou vterinu
+     v takovem pripade budu cekat pomoci while, az se vterina preklopi a nasledne se objednavka smaze
+     */
+    while(std::filesystem::exists(save_name)) {
+        time = get_time_stamp();
+        save_name = path_to_orders + order_name + "-" + time + ".txt";
+    }
+    
+    std::ofstream new_file (save_name);
+    
+    new_file << order_to_save << endl;
+    
+}
 
 
 

@@ -5,15 +5,14 @@
 //  Created by Tobias Vavroch on 09/11/2021.
 //
 
-#pragma once
 #include <stdio.h>
 #include <string>
 #include <vector>
 #include <algorithm>
 #include <memory>
-#include "CashDesk.hpp"
-#include "Data.hpp"
+#include <iostream>
 
+#include "CashDesk.hpp"
 #include "lib/decimal.h"
 
 /*
@@ -66,6 +65,12 @@ public:
     
     /* Vsechny commandy nasledne implementuji virtualni funkci process_command*/
     virtual void process_command() = 0;
+    
+    /*
+     Kontrola, ze vstup je ascii. Pouziva se pri libovolnem 
+     */
+    static bool is_input_ascii(const string& string_to_check);
+    
 };
 
 //prazdny prikaz
@@ -142,10 +147,16 @@ private:
 public:
     Process(CashDesk& kasa, const vector<string>& tokenized_command): Command(kasa, tokenized_command){};
     virtual ~Process(){}
-    //implementuje jedinou funkci, pro prehlednost implementovano jiz zde
+    //implementuje jedinou funkci, pro prehlednost implementovano jiz zde, nedavalo mi smysl v teto chvili vytvaret .cpp soubor s jednou funkci
     void process_command() {
         /*chci ukazat procesovanou objednavku, pokud neexistuje, nic procesovat nebudu
           kasa by sice objednavku odmitla, ale UI by se nechovalo idealne, lepsi hned odchytit*/
+        
+        if(tokenized.size() != 2) {
+            cout << "Unknown parameters" << endl;
+            return;
+        }
+        
         if(!kasa->show_order(tokenized[1])) {
             return;
         }
@@ -155,6 +166,13 @@ public:
         
         //pokusim se nacist placenou castku
         while (getline(cin, amount)) {
+            
+            if(!is_input_ascii(amount)) {
+                cout << "Invalid amount. Unknown chars read by input. Please avoid them." << endl;
+                cout << "Paid: ";
+                continue;
+            }
+            
             //input si tokenizuji
             vector<string> test = Command::tokenize_command(amount);
             //pokud je prazdnu, je to zpusob jak procesovani objednavky zrusit
@@ -164,7 +182,8 @@ public:
             }
             //pokud mam vice nez jeden token(castku) nebo tento token neni v decimalnim formatu, odmitam a nacitam znovu
             if((test.size() > 1) | (!Command::is_decimal(test[0]))) {
-                cout << "Invalid amount" << endl;
+                cout << "Invalid amount." << endl;
+                cout << "Paid: ";
                 continue;
             }
             //procesuji objednavku

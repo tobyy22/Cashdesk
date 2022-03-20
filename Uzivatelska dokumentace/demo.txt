@@ -1,4 +1,8 @@
 
+Uživatelské prostředí bylo lehce změněné, nenechte se tím znervóznit. Vypisuje
+se akorát více hlášek pro lepší informovanost uživatele co má dělat. Demo je jinak
+funkční.
+
 
 Na začátku začínáme s kasou, které neobsahuje žádná data.
 

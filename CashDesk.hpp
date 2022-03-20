@@ -6,12 +6,10 @@
 //
 
 
-#pragma once
 
 #include <stdio.h>
 #include <vector>
-#include "Item.hpp"
-#include "Order.hpp"
+
 #include "Data.hpp"
 #include "Identificator.hpp"
 
@@ -25,6 +23,8 @@
 const int max_number_of_items = 1000;
 const int max_number_of_orders = 999;
 const int max_item_price = 999999;
+const int max_number_of_all_items_in_all_orders = 1000;
+const int max_cash_in_cashdesk = 1000000000;
 
 
 /* Trida simuluje klasickou pokladnu. Obsahuje data o polozkach, zamestnancich, lze pridavat/mazat/upravovat data, vytvaret objednavky
@@ -65,6 +65,8 @@ private:
     static bool price_ok(string amount);
     static bool item_order_name_ok(const string& item_name);
     
+    int number_of_all_items_in_all_orders();
+    
 public:
     /*
      Rozhrani tridy vypada tak, ze vetsina funkci prijima stringove parametry, ktere si pak sama prevadi to pozadovane podoby.
@@ -82,7 +84,7 @@ public:
      */
     void add_item(const string& item_name, const string& item_price);
     bool add_order(const string& order_name);
-    void add_order();
+    bool add_order();
     void add_to_order(const string& item_name, const string& amount);
     void add_to_order(const string& order_name, const string& item_name, const string& amount);
     
@@ -93,7 +95,8 @@ public:
     void remove_order(const string& order_name);
     void remove_item(const string& name);
     
-    /* ruzne dalsi funkce CashDesk, podorobneji popsany tam, kde jsou implementovany*/
+    /* ruzne dalsi funkce CashDesk, podorobneji popsany tam, kde jsou implementovany
+     jejich funkce by mela byt zrejma z jejich jmen, pripadne slozitosti v implementaci popsany v implementaci*/
     void find_order(const string& order_name);
     void find_item(const string& item);
     void set_cash(const string& cash);
@@ -103,7 +106,7 @@ public:
     void show_all_orders();
     void show_cash();
     bool active_order_ready();
-    void show_order();
+    bool show_active_order();
     
     
 

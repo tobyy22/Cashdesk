@@ -4,7 +4,6 @@
 //
 //  Created by Tobias Vavroch on 21/10/2021.
 //
-#include <iostream>
 #include "Item.hpp"
 
 using Money = dec::decimal<2>;
@@ -14,24 +13,24 @@ Item::Item(string name, Money price) {
     this->price = price;
 }
 
-const string& Item::getName() {
+const string& Item::get_name() {
     return this->item_name;
 }
 
-const Money& Item::getPrice() {
+const Money& Item::get_price() {
     return price;
 }
 
-/*item vypisuji tak, jak typicky vypadaji polozky na uctence – jmeno polozky, nekolik tecek, cena za kus, mnozstvi a celkova cena polozky pri danem mnozstvi
+/*
+ Item vypisuji tak, jak typicky vypadaji polozky na uctence – jmeno polozky, nekolik tecek, cena za kus, mnozstvi a celkova cena polozky pri danem mnozstvi
  pri maximalni delce jmena polozky chci, aby tam stale tecek bylo alespon 5
+ 
+ Vypsani polozky na ostream. Vypise pouze jmeno polozky, oddelovac (tecky) a cenu polozky bez endl, aby za ni bylo mozne pridat i mnozstvi pri
+ vypisovani objednavky
  */
-void Item::ShowItem(Money amount) {
-    string offset(item_name_max_length + 5 - item_name.size(), '.');
-    std::cout << item_name << offset << price << " x " << amount << ' ' << amount*price << std:: endl;
-}
-
-//zobrazeni polozky bez mnozstvi a celkove ceny – tak jak typicky vypadaji v restauracnim menu
-void Item::ShowItem() {
-    string offset(item_name_max_length + 5 - item_name.size(), '.');
-    std::cout << item_name << offset << price << std:: endl;
+ostream& operator<<(ostream& os, const Item& item)
+{
+    string offset(item_name_max_length + 5 - item.item_name.size(), '.');
+    os << item.item_name << offset << item.price;
+    return os;
 }
